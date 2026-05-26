@@ -185,7 +185,6 @@
 
   <!-- TIJDRIT SCHERM -->
   <div id="screen-race" style="display: none;">
-    <button id="race-back" style="margin-bottom: 12px;">← Terug</button>
     <div class="header">
       <span id="race-label" class="subtle">400m test</span>
       <span id="race-finished" class="very-subtle">0 / 0 gefinisht</span>
@@ -206,6 +205,9 @@
       <button id="race-undo" style="flex: 1; height: 44px;">↶ Ongedaan</button>
       <button id="race-next" class="btn-primary" style="flex: 2; height: 44px; font-size: 15px; font-weight: 500;">Volgende →</button>
     </div>
+
+    <button id="race-back" style="width: 100%; height: 44px; margin-top: 8px;">← Terug</button>
+    <button id="race-abort" class="btn-danger" style="width: 100%; height: 44px; margin-top: 8px; display: none;">✕ Afbreken</button>
   </div>
 
   <!-- RUST SCHERM -->
@@ -276,8 +278,12 @@
     showScreen('setup');
   }
   $('race-back').onclick = () => {
-    const hasData = raceRunning || Object.keys(currentFinishes || {}).length > 0;
+    const hasData = Object.keys(currentFinishes || {}).length > 0;
     if (hasData && !confirm('Terug naar het startscherm? De huidige tijden gaan verloren.')) return;
+    goToSetup();
+  };
+  $('race-abort').onclick = () => {
+    if (!confirm('Test afbreken en terug naar het startscherm? De huidige tijden gaan verloren.')) return;
     goToSetup();
   };
   $('rest-back').onclick = () => {
@@ -356,6 +362,8 @@
     sb.innerHTML = '▶ Start';
     sb.className = 'btn-success';
     $('race-done-controls').style.display = 'none';
+    $('race-back').style.display = '';
+    $('race-abort').style.display = 'none';
     renderGrid();
     updateFinishCount();
     showScreen('race');
@@ -425,6 +433,11 @@
         if (raceRunning) {
           sb.innerHTML = '■ Stop klok';
           sb.className = 'btn-danger';
+          $('race-abort').style.display = '';
+          $('race-back').style.display = 'none';
+        } else {
+          $('race-back').style.display = '';
+          $('race-abort').style.display = 'none';
         }
       }
     }
@@ -440,6 +453,8 @@
       stopRaceTimer();
       $('race-start-btn').style.display = 'none';
       $('race-done-controls').style.display = 'flex';
+      $('race-abort').style.display = 'none';
+      $('race-back').style.display = 'none';
     }
   }
 
@@ -457,10 +472,14 @@
       }, 100);
       this.innerHTML = '■ Stop klok';
       this.className = 'btn-danger';
+      $('race-back').style.display = 'none';
+      $('race-abort').style.display = '';
     } else {
       stopRaceTimer();
       $('race-start-btn').style.display = 'none';
       $('race-done-controls').style.display = 'flex';
+      $('race-abort').style.display = 'none';
+      $('race-back').style.display = 'none';
     }
   };
 
