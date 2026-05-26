@@ -201,6 +201,8 @@
     <p class="very-subtle" style="margin: 0 0 8px;">Tik op nummer bij finish</p>
     <div id="number-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;"></div>
 
+    <div id="finish-list" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;"></div>
+
     <div id="race-done-controls" style="display: none; gap: 8px;">
       <button id="race-undo" style="flex: 1; height: 44px;">↶ Ongedaan</button>
       <button id="race-next" class="btn-primary" style="flex: 2; height: 44px; font-size: 15px; font-weight: 500;">Volgende →</button>
@@ -365,6 +367,7 @@
     $('race-back').style.display = '';
     $('race-abort').style.display = 'none';
     renderGrid();
+    renderFinishList();
     updateFinishCount();
     showScreen('race');
   }
@@ -409,6 +412,27 @@
     }
   }
 
+  function renderFinishList() {
+    const wrap = $('finish-list');
+    wrap.innerHTML = '';
+    finishOrder.forEach((id, idx) => {
+      const row = document.createElement('div');
+      row.className = 'card-surface';
+      row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px 12px;';
+      const label = swimmerNames[id] || id;
+      const left = document.createElement('span');
+      left.textContent = (idx + 1) + '. ' + label + ' is gefinisht';
+      left.style.cssText = 'font-weight: 500;';
+      const right = document.createElement('span');
+      right.className = 'tabular';
+      right.style.cssText = 'font-size: 13px; color: var(--text-secondary);';
+      right.textContent = fmtTime(currentFinishes[id]);
+      row.appendChild(left);
+      row.appendChild(right);
+      wrap.appendChild(row);
+    });
+  }
+
   function recordFinish(id) {
     if (!raceRunning) return;
     if (currentFinishes[id] !== undefined) return;
@@ -416,6 +440,7 @@
     currentFinishes[id] = elapsed;
     finishOrder.push(id);
     renderGrid();
+    renderFinishList();
     updateFinishCount();
     checkAllDone();
   }
@@ -425,6 +450,7 @@
     if (last !== undefined) {
       delete currentFinishes[last];
       renderGrid();
+      renderFinishList();
       updateFinishCount();
       if (Object.keys(currentFinishes).length < numSwimmers) {
         $('race-done-controls').style.display = 'none';
