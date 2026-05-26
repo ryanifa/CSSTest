@@ -1,4 +1,4 @@
-const CACHE = 'css-test-v1';
+const CACHE = 'css-test-v2';
 const ASSETS = [
   '.',
   'index.html',

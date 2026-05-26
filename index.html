@@ -186,6 +186,9 @@
       Formule: CSS = 200 / (T₄₀₀ − T₂₀₀) m/s.<br>
       Voer eerst de 400m uit, na rust de 200m. Beide all-out.
     </p>
+
+    <button id="install-btn" class="btn-success" style="width: 100%; height: 48px; margin-top: 16px; font-size: 15px; font-weight: 500; display: none;">📲 Installeer als app</button>
+    <p id="install-hint" class="subtle" style="display: none; margin-top: 12px; line-height: 1.6;"></p>
   </div>
 
   <!-- TIJDRIT SCHERM -->
@@ -678,6 +681,40 @@
     $('rest-clock').style.color = '';
     showScreen('setup');
   };
+
+  // Installeerbaarheid
+  let deferredPrompt = null;
+  const installBtn = $('install-btn');
+  const installHint = $('install-hint');
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!isStandalone) installBtn.style.display = '';
+  });
+
+  installBtn.onclick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (choice.outcome === 'accepted') installBtn.style.display = 'none';
+    } else if (isIOS) {
+      installHint.textContent = 'Open deze pagina in Safari, tik op het deel-icoon en kies "Zet op beginscherm".';
+      installHint.style.display = installHint.style.display === 'block' ? 'none' : 'block';
+    }
+  };
+
+  window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    installHint.style.display = 'none';
+  });
+
+  if (isIOS && !isStandalone) {
+    installBtn.style.display = '';
+  }
 
   updateSetup();
   renderNames();
