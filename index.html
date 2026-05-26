@@ -185,6 +185,7 @@
 
   <!-- TIJDRIT SCHERM -->
   <div id="screen-race" style="display: none;">
+    <button id="race-back" style="margin-bottom: 12px;">← Terug</button>
     <div class="header">
       <span id="race-label" class="subtle">400m test</span>
       <span id="race-finished" class="very-subtle">0 / 0 gefinisht</span>
@@ -209,6 +210,7 @@
 
   <!-- RUST SCHERM -->
   <div id="screen-rest" style="display: none;">
+    <button id="rest-back" style="margin-bottom: 12px;">← Terug</button>
     <h2 style="margin-bottom: 4px;">Rust</h2>
     <p class="subtle" style="margin-bottom: 16px;">Rustig uitzwemmen, drinken, voorbereiden op de 200m.</p>
 
@@ -266,6 +268,22 @@
     screens.forEach(s => $('screen-' + s).style.display = (s === name) ? '' : 'none');
     window.scrollTo(0, 0);
   }
+
+  function goToSetup() {
+    stopRaceTimer();
+    if (restTimer) { clearInterval(restTimer); restTimer = null; }
+    $('rest-clock').style.color = '';
+    showScreen('setup');
+  }
+  $('race-back').onclick = () => {
+    const hasData = raceRunning || Object.keys(currentFinishes || {}).length > 0;
+    if (hasData && !confirm('Terug naar het startscherm? De huidige tijden gaan verloren.')) return;
+    goToSetup();
+  };
+  $('rest-back').onclick = () => {
+    if (!confirm('Terug naar het startscherm? De huidige test wordt afgebroken.')) return;
+    goToSetup();
+  };
 
   function updateSetup() {
     $('swimmers-count').textContent = numSwimmers;
