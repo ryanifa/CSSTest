@@ -342,14 +342,16 @@
     return String(min).padStart(2,'0') + ':' + String(sec).padStart(2,'0') + '.' + tenths;
   }
   function fmtTime(sec) {
-    const min = Math.floor(sec / 60);
-    const s = sec - min * 60;
+    const tenths = Math.round(sec * 10);
+    const min = Math.floor(tenths / 600);
+    const s = (tenths - min * 600) / 10;
     return min + ':' + s.toFixed(1).padStart(4, '0');
   }
   function fmtPace(secPer100) {
     if (!isFinite(secPer100) || secPer100 <= 0) return '—';
-    const min = Math.floor(secPer100 / 60);
-    const s = Math.round(secPer100 - min * 60);
+    const total = Math.round(secPer100);
+    const min = Math.floor(total / 60);
+    const s = total - min * 60;
     return min + ':' + String(s).padStart(2, '0');
   }
   function fmtRest(sec) {
