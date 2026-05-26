@@ -125,6 +125,18 @@
   }
   .subtle { font-size: 13px; color: var(--text-secondary); }
   .very-subtle { font-size: 12px; color: var(--text-tertiary); }
+  input[type="text"] {
+    font-family: inherit;
+    font-size: 15px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 9px 10px;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  input[type="text"]::placeholder { color: var(--text-tertiary); }
 </style>
 </head>
 <body>
@@ -147,6 +159,11 @@
         <span id="swimmers-count" class="tabular" style="font-size: 26px; font-weight: 500; min-width: 50px; text-align: center;">6</span>
         <button id="inc-swimmers" style="width: 40px; height: 40px; padding: 0; font-size: 20px;">+</button>
       </div>
+    </div>
+
+    <div class="card-secondary" style="margin-bottom: 12px;">
+      <label class="subtle" style="display: block; margin-bottom: 10px;">Namen (optioneel)</label>
+      <div id="names-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
     </div>
 
     <div class="card-secondary" style="margin-bottom: 20px;">
@@ -228,6 +245,7 @@
 (function() {
   let numSwimmers = 6;
   let restMinutes = 10;
+  let swimmerNames = {};
   let phase = 'setup';
   let raceStart = null;
   let raceTimer = null;
@@ -241,6 +259,7 @@
   let restPaused = false;
 
   const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   const screens = ['setup', 'race', 'rest', 'results'];
   function showScreen(name) {
@@ -252,8 +271,32 @@
     $('swimmers-count').textContent = numSwimmers;
     $('rest-count').textContent = restMinutes;
   }
-  $('dec-swimmers').onclick = () => { if (numSwimmers > 1) { numSwimmers--; updateSetup(); } };
-  $('inc-swimmers').onclick = () => { if (numSwimmers < 50) { numSwimmers++; updateSetup(); } };
+  function renderNames() {
+    const wrap = $('names-list');
+    wrap.innerHTML = '';
+    for (let i = 1; i <= numSwimmers; i++) {
+      const row = document.createElement('div');
+      row.style.cssText = 'display: flex; align-items: center; gap: 10px;';
+      const lbl = document.createElement('span');
+      lbl.className = 'tabular';
+      lbl.textContent = i;
+      lbl.style.cssText = 'min-width: 26px; text-align: center; font-weight: 500; font-size: 15px;';
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.value = swimmerNames[i] || '';
+      inp.placeholder = 'Naam (optioneel)';
+      inp.maxLength = 20;
+      inp.oninput = () => {
+        const v = inp.value.trim();
+        if (v) swimmerNames[i] = v; else delete swimmerNames[i];
+      };
+      row.appendChild(lbl);
+      row.appendChild(inp);
+      wrap.appendChild(row);
+    }
+  }
+  $('dec-swimmers').onclick = () => { if (numSwimmers > 1) { numSwimmers--; updateSetup(); renderNames(); } };
+  $('inc-swimmers').onclick = () => { if (numSwimmers < 50) { numSwimmers++; updateSetup(); renderNames(); } };
   $('dec-rest').onclick = () => { if (restMinutes > 1) { restMinutes--; updateSetup(); } };
   $('inc-rest').onclick = () => { if (restMinutes < 30) { restMinutes++; updateSetup(); } };
 
@@ -313,8 +356,21 @@
     }
     for (let i = 1; i <= numSwimmers; i++) {
       const btn = document.createElement('button');
-      btn.textContent = i;
-      btn.style.cssText = 'height: 60px; font-size: 20px; font-weight: 500;';
+      const name = swimmerNames[i];
+      if (name) {
+        btn.style.cssText = 'height: 60px; font-weight: 500; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; line-height: 1.1; padding: 4px;';
+        const numDiv = document.createElement('div');
+        numDiv.textContent = i;
+        numDiv.style.cssText = 'font-size: 18px;';
+        const nameDiv = document.createElement('div');
+        nameDiv.textContent = name;
+        nameDiv.style.cssText = 'font-size: 11px; font-weight: 400; color: var(--text-secondary); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
+        btn.appendChild(numDiv);
+        btn.appendChild(nameDiv);
+      } else {
+        btn.textContent = i;
+        btn.style.cssText = 'height: 60px; font-size: 20px; font-weight: 500;';
+      }
       const finished = currentFinishes[i] !== undefined;
       if (finished) {
         btn.style.background = 'var(--surface-2)';
@@ -460,7 +516,7 @@
         cssSpeed = 200 / (t400 - t200);
         cssPace = 100 / cssSpeed;
       }
-      rows.push({ id: i, t400, t200, cssPace, cssSpeed });
+      rows.push({ id: i, name: swimmerNames[i] || null, t400, t200, cssPace, cssSpeed });
     }
     rows.sort((a, b) => {
       if (a.cssPace == null && b.cssPace == null) return a.id - b.id;
@@ -475,9 +531,10 @@
       const t400txt = r.t400 ? fmtTime(r.t400) : '—';
       const t200txt = r.t200 ? fmtTime(r.t200) : '—';
       const trophy = (idx === 0 && r.cssPace) ? ' 🏆' : '';
+      const label = '#' + r.id + (r.name ? ' ' + esc(r.name) : '') + trophy;
       card.innerHTML =
         '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
-          '<span style="font-weight: 500; font-size: 16px;">#' + r.id + trophy + '</span>' +
+          '<span style="font-weight: 500; font-size: 16px;">' + label + '</span>' +
           '<span class="tabular" style="font-size: 20px; font-weight: 500; color: var(--info-text);">' + pace +
             '<span style="font-size: 12px; color: var(--text-secondary); font-weight: 400;"> /100m</span>' +
           '</span>' +
@@ -497,7 +554,7 @@
     let text = 'CSS groepstest — ' + new Date().toLocaleDateString('nl-NL') + '\n\n';
     rows.forEach((r, idx) => {
       const medal = idx === 0 && r.cssPace ? '🏆 ' : '   ';
-      text += medal + '#' + r.id +
+      text += medal + '#' + r.id + (r.name ? ' ' + r.name : '') +
         '  CSS: ' + (r.cssPace ? fmtPace(r.cssPace) : '—') + '/100m' +
         '  (400m ' + (r.t400 ? fmtTime(r.t400) : '—') +
         ', 200m ' + (r.t200 ? fmtTime(r.t200) : '—') + ')\n';
@@ -555,6 +612,7 @@
   };
 
   updateSetup();
+  renderNames();
   showScreen('setup');
 })();
 </script>
