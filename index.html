@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f5f4ef">
+<title>CSS groepstest zwemmen</title>
+<style>
+  :root {
+    --bg: #f5f4ef;
+    --surface: #ffffff;
+    --surface-2: #ebeae3;
+    --text: #1a1a19;
+    --text-secondary: #5f5e5a;
+    --text-tertiary: #888780;
+    --border: rgba(0,0,0,0.12);
+    --border-strong: rgba(0,0,0,0.22);
+    --info-bg: #E6F1FB;
+    --info-text: #0C447C;
+    --info-border: #378ADD;
+    --success-bg: #EAF3DE;
+    --success-text: #27500A;
+    --success-border: #639922;
+    --danger-bg: #FCEBEB;
+    --danger-text: #791F1F;
+    --danger-border: #E24B4A;
+    --warning-text: #854F0B;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a19;
+      --surface: #2c2c2a;
+      --surface-2: #232321;
+      --text: #f1efe8;
+      --text-secondary: #b4b2a9;
+      --text-tertiary: #888780;
+      --border: rgba(255,255,255,0.12);
+      --border-strong: rgba(255,255,255,0.25);
+      --info-bg: #0C447C;
+      --info-text: #B5D4F4;
+      --info-border: #378ADD;
+      --success-bg: #27500A;
+      --success-text: #C0DD97;
+      --success-border: #639922;
+      --danger-bg: #791F1F;
+      --danger-text: #F7C1C1;
+      --danger-border: #E24B4A;
+      --warning-text: #FAC775;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+  body {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px;
+    min-height: 100vh;
+  }
+  h1, h2, h3 { font-weight: 500; margin: 0; }
+  h1 { font-size: 22px; }
+  h2 { font-size: 18px; }
+  h3 { font-size: 16px; }
+  p { margin: 0; }
+  button {
+    font-family: inherit;
+    font-size: 14px;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+    touch-action: manipulation;
+  }
+  button:hover:not(:disabled) { background: var(--surface-2); }
+  button:active:not(:disabled) { transform: scale(0.97); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary {
+    background: var(--info-bg);
+    color: var(--info-text);
+    border-color: var(--info-border);
+  }
+  .btn-success {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border-color: var(--success-border);
+  }
+  .btn-danger {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border-color: var(--danger-border);
+  }
+  .card-secondary {
+    background: var(--surface-2);
+    border-radius: var(--radius-md);
+    padding: 16px;
+  }
+  .card-surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px;
+  }
+  .tabular { font-variant-numeric: tabular-nums; }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .subtle { font-size: 13px; color: var(--text-secondary); }
+  .very-subtle { font-size: 12px; color: var(--text-tertiary); }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- SETUP SCHERM -->
+  <div id="screen-setup">
+    <div class="header">
+      <h1>CSS groepstest</h1>
+    </div>
+    <p class="subtle" style="margin-bottom: 20px; line-height: 1.7;">
+      Meet de Critical Swim Speed van meerdere zwemmers tegelijk. Iedereen start gelijktijdig; tik op het nummer bij finish.
+    </p>
+
+    <div class="card-secondary" style="margin-bottom: 12px;">
+      <label class="subtle" style="display: block; margin-bottom: 8px;">Aantal zwemmers</label>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button id="dec-swimmers" style="width: 40px; height: 40px; padding: 0; font-size: 20px;">−</button>
+        <span id="swimmers-count" class="tabular" style="font-size: 26px; font-weight: 500; min-width: 50px; text-align: center;">6</span>
+        <button id="inc-swimmers" style="width: 40px; height: 40px; padding: 0; font-size: 20px;">+</button>
+      </div>
+    </div>
+
+    <div class="card-secondary" style="margin-bottom: 20px;">
+      <label class="subtle" style="display: block; margin-bottom: 8px;">Rust tussen 400m en 200m (min)</label>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button id="dec-rest" style="width: 40px; height: 40px; padding: 0; font-size: 20px;">−</button>
+        <span id="rest-count" class="tabular" style="font-size: 26px; font-weight: 500; min-width: 50px; text-align: center;">10</span>
+        <button id="inc-rest" style="width: 40px; height: 40px; padding: 0; font-size: 20px;">+</button>
+      </div>
+    </div>
+
+    <button id="start-400" class="btn-primary" style="width: 100%; height: 52px; font-size: 16px; font-weight: 500;">Start 400m test →</button>
+
+    <p class="very-subtle" style="margin-top: 20px; line-height: 1.6;">
+      Formule: CSS = 200 / (T₄₀₀ − T₂₀₀) m/s.<br>
+      Voer eerst de 400m uit, na rust de 200m. Beide all-out.
+    </p>
+  </div>
+
+  <!-- TIJDRIT SCHERM -->
+  <div id="screen-race" style="display: none;">
+    <div class="header">
+      <span id="race-label" class="subtle">400m test</span>
+      <span id="race-finished" class="very-subtle">0 / 0 gefinisht</span>
+    </div>
+
+    <div class="card-secondary" style="text-align: center; padding: 24px 16px; margin-bottom: 12px;">
+      <div id="race-clock" class="tabular" style="font-size: 48px; font-weight: 500; letter-spacing: 1px;">00:00.0</div>
+    </div>
+
+    <div id="race-controls" style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <button id="race-start-btn" class="btn-success" style="flex: 1; height: 48px; font-size: 15px; font-weight: 500;">▶ Start</button>
+    </div>
+
+    <p class="very-subtle" style="margin: 0 0 8px;">Tik op nummer bij finish</p>
+    <div id="number-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;"></div>
+
+    <div id="race-done-controls" style="display: none; gap: 8px;">
+      <button id="race-undo" style="flex: 1; height: 44px;">↶ Ongedaan</button>
+      <button id="race-next" class="btn-primary" style="flex: 2; height: 44px; font-size: 15px; font-weight: 500;">Volgende →</button>
+    </div>
+  </div>
+
+  <!-- RUST SCHERM -->
+  <div id="screen-rest" style="display: none;">
+    <h2 style="margin-bottom: 4px;">Rust</h2>
+    <p class="subtle" style="margin-bottom: 16px;">Rustig uitzwemmen, drinken, voorbereiden op de 200m.</p>
+
+    <div class="card-secondary" style="text-align: center; padding: 24px 16px; margin-bottom: 16px;">
+      <div id="rest-clock" class="tabular" style="font-size: 52px; font-weight: 500; letter-spacing: 1px;">10:00</div>
+    </div>
+
+    <div style="display: flex; gap: 8px;">
+      <button id="rest-toggle" style="flex: 1; height: 48px; font-size: 15px; font-weight: 500;">⏸ Pauze</button>
+      <button id="rest-skip" class="btn-primary" style="flex: 1; height: 48px; font-size: 15px; font-weight: 500;">Skip naar 200m →</button>
+    </div>
+  </div>
+
+  <!-- RESULTATEN -->
+  <div id="screen-results" style="display: none;">
+    <div class="header">
+      <h1>Resultaten</h1>
+    </div>
+    <p class="subtle" style="margin-bottom: 16px;">CSS pace per 100m, gesorteerd op snelheid.</p>
+
+    <div id="results-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;"></div>
+
+    <div style="display: flex; gap: 8px;">
+      <button id="results-copy" style="flex: 1; height: 44px;">📋 Kopieer</button>
+      <button id="results-share" style="flex: 1; height: 44px;">↗ Deel</button>
+      <button id="results-restart" style="flex: 1; height: 44px;">↻ Nieuw</button>
+    </div>
+    <p id="copy-feedback" style="font-size: 13px; color: var(--success-text); margin: 12px 0 0; text-align: center; opacity: 0; transition: opacity 0.3s; min-height: 18px;">Gekopieerd naar klembord</p>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  let numSwimmers = 6;
+  let restMinutes = 10;
+  let phase = 'setup';
+  let raceStart = null;
+  let raceTimer = null;
+  let raceRunning = false;
+  let finishes400 = {};
+  let finishes200 = {};
+  let currentFinishes = null;
+  let finishOrder = [];
+  let restRemaining = 0;
+  let restTimer = null;
+  let restPaused = false;
+
+  const $ = id => document.getElementById(id);
+
+  const screens = ['setup', 'race', 'rest', 'results'];
+  function showScreen(name) {
+    screens.forEach(s => $('screen-' + s).style.display = (s === name) ? '' : 'none');
+    window.scrollTo(0, 0);
+  }
+
+  function updateSetup() {
+    $('swimmers-count').textContent = numSwimmers;
+    $('rest-count').textContent = restMinutes;
+  }
+  $('dec-swimmers').onclick = () => { if (numSwimmers > 1) { numSwimmers--; updateSetup(); } };
+  $('inc-swimmers').onclick = () => { if (numSwimmers < 50) { numSwimmers++; updateSetup(); } };
+  $('dec-rest').onclick = () => { if (restMinutes > 1) { restMinutes--; updateSetup(); } };
+  $('inc-rest').onclick = () => { if (restMinutes < 30) { restMinutes++; updateSetup(); } };
+
+  function fmtClock(ms) {
+    const totalMs = Math.max(0, ms);
+    const min = Math.floor(totalMs / 60000);
+    const sec = Math.floor((totalMs % 60000) / 1000);
+    const tenths = Math.floor((totalMs % 1000) / 100);
+    return String(min).padStart(2,'0') + ':' + String(sec).padStart(2,'0') + '.' + tenths;
+  }
+  function fmtTime(sec) {
+    const min = Math.floor(sec / 60);
+    const s = sec - min * 60;
+    return min + ':' + s.toFixed(1).padStart(4, '0');
+  }
+  function fmtPace(secPer100) {
+    if (!isFinite(secPer100) || secPer100 <= 0) return '—';
+    const min = Math.floor(secPer100 / 60);
+    const s = Math.round(secPer100 - min * 60);
+    return min + ':' + String(s).padStart(2, '0');
+  }
+  function fmtRest(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec - m * 60;
+    return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }
+
+  function startRace(label) {
+    phase = label;
+    currentFinishes = (label === 'race400') ? finishes400 : finishes200;
+    Object.keys(currentFinishes).forEach(k => delete currentFinishes[k]);
+    finishOrder = [];
+    raceRunning = false;
+    raceStart = null;
+    $('race-label').textContent = (label === 'race400') ? '400m test' : '200m test';
+    $('race-clock').textContent = '00:00.0';
+    const sb = $('race-start-btn');
+    sb.style.display = '';
+    sb.innerHTML = '▶ Start';
+    sb.className = 'btn-success';
+    $('race-done-controls').style.display = 'none';
+    renderGrid();
+    updateFinishCount();
+    showScreen('race');
+  }
+
+  function renderGrid() {
+    const grid = $('number-grid');
+    grid.innerHTML = '';
+    // Adjust columns for many swimmers
+    if (numSwimmers > 16) {
+      grid.style.gridTemplateColumns = 'repeat(5, 1fr)';
+    } else if (numSwimmers > 12) {
+      grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    } else {
+      grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    }
+    for (let i = 1; i <= numSwimmers; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.style.cssText = 'height: 60px; font-size: 20px; font-weight: 500;';
+      const finished = currentFinishes[i] !== undefined;
+      if (finished) {
+        btn.style.background = 'var(--surface-2)';
+        btn.style.color = 'var(--text-tertiary)';
+        btn.style.textDecoration = 'line-through';
+        btn.disabled = true;
+      }
+      btn.onclick = () => recordFinish(i);
+      grid.appendChild(btn);
+    }
+  }
+
+  function recordFinish(id) {
+    if (!raceRunning) return;
+    if (currentFinishes[id] !== undefined) return;
+    const elapsed = (performance.now() - raceStart) / 1000;
+    currentFinishes[id] = elapsed;
+    finishOrder.push(id);
+    renderGrid();
+    updateFinishCount();
+    checkAllDone();
+  }
+
+  function undoLastFinish() {
+    const last = finishOrder.pop();
+    if (last !== undefined) {
+      delete currentFinishes[last];
+      renderGrid();
+      updateFinishCount();
+      if (Object.keys(currentFinishes).length < numSwimmers) {
+        $('race-done-controls').style.display = 'none';
+        const sb = $('race-start-btn');
+        sb.style.display = '';
+        if (raceRunning) {
+          sb.innerHTML = '■ Stop klok';
+          sb.className = 'btn-danger';
+        }
+      }
+    }
+  }
+
+  function updateFinishCount() {
+    const done = Object.keys(currentFinishes).length;
+    $('race-finished').textContent = done + ' / ' + numSwimmers + ' gefinisht';
+  }
+
+  function checkAllDone() {
+    if (Object.keys(currentFinishes).length === numSwimmers) {
+      stopRaceTimer();
+      $('race-start-btn').style.display = 'none';
+      $('race-done-controls').style.display = 'flex';
+    }
+  }
+
+  function stopRaceTimer() {
+    raceRunning = false;
+    if (raceTimer) { clearInterval(raceTimer); raceTimer = null; }
+  }
+
+  $('race-start-btn').onclick = function() {
+    if (!raceRunning) {
+      raceRunning = true;
+      raceStart = performance.now();
+      raceTimer = setInterval(() => {
+        $('race-clock').textContent = fmtClock(performance.now() - raceStart);
+      }, 100);
+      this.innerHTML = '■ Stop klok';
+      this.className = 'btn-danger';
+    } else {
+      stopRaceTimer();
+      $('race-start-btn').style.display = 'none';
+      $('race-done-controls').style.display = 'flex';
+    }
+  };
+
+  $('race-undo').onclick = undoLastFinish;
+  $('race-next').onclick = function() {
+    if (phase === 'race400') {
+      startRest();
+    } else {
+      showResults();
+    }
+  };
+
+  $('start-400').onclick = () => startRace('race400');
+
+  function startRest() {
+    restRemaining = restMinutes * 60;
+    restPaused = false;
+    $('rest-clock').textContent = fmtRest(restRemaining);
+    $('rest-toggle').innerHTML = '⏸ Pauze';
+    showScreen('rest');
+    runRestTimer();
+  }
+  function runRestTimer() {
+    if (restTimer) clearInterval(restTimer);
+    restTimer = setInterval(() => {
+      if (!restPaused) {
+        restRemaining--;
+        $('rest-clock').textContent = fmtRest(Math.max(0, restRemaining));
+        if (restRemaining <= 0) {
+          clearInterval(restTimer);
+          restTimer = null;
+          $('rest-clock').style.color = 'var(--success-text)';
+          // Try to play a beep
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = 880;
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+            osc.start(); osc.stop(ctx.currentTime + 0.5);
+          } catch (e) {}
+          setTimeout(() => {
+            $('rest-clock').style.color = '';
+            startRace('race200');
+          }, 1500);
+        }
+      }
+    }, 1000);
+  }
+  $('rest-toggle').onclick = function() {
+    restPaused = !restPaused;
+    this.innerHTML = restPaused ? '▶ Hervat' : '⏸ Pauze';
+  };
+  $('rest-skip').onclick = () => {
+    if (restTimer) { clearInterval(restTimer); restTimer = null; }
+    startRace('race200');
+  };
+
+  function showResults() {
+    const list = $('results-list');
+    list.innerHTML = '';
+    const rows = [];
+    for (let i = 1; i <= numSwimmers; i++) {
+      const t400 = finishes400[i];
+      const t200 = finishes200[i];
+      let cssPace = null;
+      let cssSpeed = null;
+      if (t400 && t200 && (t400 - t200) > 0) {
+        cssSpeed = 200 / (t400 - t200);
+        cssPace = 100 / cssSpeed;
+      }
+      rows.push({ id: i, t400, t200, cssPace, cssSpeed });
+    }
+    rows.sort((a, b) => {
+      if (a.cssPace == null && b.cssPace == null) return a.id - b.id;
+      if (a.cssPace == null) return 1;
+      if (b.cssPace == null) return -1;
+      return a.cssPace - b.cssPace;
+    });
+    rows.forEach((r, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card-surface';
+      const pace = r.cssPace ? fmtPace(r.cssPace) : '—';
+      const t400txt = r.t400 ? fmtTime(r.t400) : '—';
+      const t200txt = r.t200 ? fmtTime(r.t200) : '—';
+      const trophy = (idx === 0 && r.cssPace) ? ' 🏆' : '';
+      card.innerHTML =
+        '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
+          '<span style="font-weight: 500; font-size: 16px;">#' + r.id + trophy + '</span>' +
+          '<span class="tabular" style="font-size: 20px; font-weight: 500; color: var(--info-text);">' + pace +
+            '<span style="font-size: 12px; color: var(--text-secondary); font-weight: 400;"> /100m</span>' +
+          '</span>' +
+        '</div>' +
+        '<div class="tabular" style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary);">' +
+          '<span>400m: ' + t400txt + '</span>' +
+          '<span>200m: ' + t200txt + '</span>' +
+        '</div>';
+      list.appendChild(card);
+    });
+    window._cssResults = rows;
+    showScreen('results');
+  }
+
+  function buildResultsText() {
+    const rows = window._cssResults || [];
+    let text = 'CSS groepstest — ' + new Date().toLocaleDateString('nl-NL') + '\n\n';
+    rows.forEach((r, idx) => {
+      const medal = idx === 0 && r.cssPace ? '🏆 ' : '   ';
+      text += medal + '#' + r.id +
+        '  CSS: ' + (r.cssPace ? fmtPace(r.cssPace) : '—') + '/100m' +
+        '  (400m ' + (r.t400 ? fmtTime(r.t400) : '—') +
+        ', 200m ' + (r.t200 ? fmtTime(r.t200) : '—') + ')\n';
+    });
+    return text;
+  }
+
+  function showFeedback(msg) {
+    const fb = $('copy-feedback');
+    fb.textContent = msg;
+    fb.style.opacity = '1';
+    setTimeout(() => fb.style.opacity = '0', 2000);
+  }
+
+  $('results-copy').onclick = function() {
+    const text = buildResultsText();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        () => showFeedback('Gekopieerd naar klembord'),
+        () => fallbackCopy(text)
+      );
+    } else {
+      fallbackCopy(text);
+    }
+  };
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showFeedback('Gekopieerd naar klembord'); }
+    catch (e) { showFeedback('Kopiëren mislukt'); }
+    document.body.removeChild(ta);
+  }
+
+  $('results-share').onclick = function() {
+    const text = buildResultsText();
+    if (navigator.share) {
+      navigator.share({ title: 'CSS groepstest', text: text }).catch(() => {});
+    } else {
+      // Fallback: WhatsApp deeplink
+      const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+      window.open(url, '_blank');
+    }
+  };
+
+  $('results-restart').onclick = () => {
+    finishes400 = {};
+    finishes200 = {};
+    $('rest-clock').style.color = '';
+    showScreen('setup');
+  };
+
+  updateSetup();
+  showScreen('setup');
+})();
+</script>
+
+</body>
+</html>
